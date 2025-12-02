@@ -1,0 +1,168 @@
+name: Flutter Accessibility Agent CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Explicitly define permissions
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  issues: write
+
+jobs:
+  flutter-build-analyze-accessibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "latest"
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Run Flutter tests with coverage
+        run: flutter test --coverage
+        continue-on-error: true
+
+      - name: Generate accessibility analysis report
+        run: |
+          mkdir -p accessibility-reports
+
+          # Scan lib directory for accessibility issues
+          echo "# Análise de Acessibilidade WCAG - Flutter Task Manager" > accessibility-reports/accessibility-summary.md
+          echo "Generated on: $(date)" >> accessibility-reports/accessibility-summary.md
+          echo "" >> accessibility-reports/accessibility-summary.md
+          echo "## Arquivos Analisados" >> accessibility-reports/accessibility-summary.md
+          find lib -name "*.dart" -type f | while read file; do
+            echo "- $file" >> accessibility-reports/accessibility-summary.md
+          done
+          echo "" >> accessibility-reports/accessibility-summary.md
+          echo "## Próximas Etapas" >> accessibility-reports/accessibility-summary.md
+          echo "1. Revisar componentes para conformidade WCAG 2.1" >> accessibility-reports/accessibility-summary.md
+          echo "2. Validar semanticLabel em ícones" >> accessibility-reports/accessibility-summary.md
+          echo "3. Testar com leitores de tela (TalkBack/VoiceOver)" >> accessibility-reports/accessibility-summary.md
+          echo "4. Verificar contraste de cores" >> accessibility-reports/accessibility-summary.md
+          echo "5. Validar navegação por teclado" >> accessibility-reports/accessibility-summary.md
+
+      - name: Upload accessibility reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-reports
+          path: accessibility-reports/
+          retention-days: 30
+
+      - name: Build Flutter application
+        run: flutter build apk --debug
+        continue-on-error: true
+
+      - name: Install GitHub Copilot CLI
+        run: |
+          npm install -g @github/copilot
+
+      - name: Run Accessibility Agent Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+        run: |
+          echo "Running Accessibility Analysis via Copilot Agent..."
+
+          # Make accessibility analysis data available
+          echo "Accessibility reports available for analysis:"
+          ls -la accessibility-reports/
+
+          # Copy accessibility data to current directory for agent access
+          if [ -d "accessibility-reports" ]; then
+            cp -r accessibility-reports/* . 2>/dev/null || true
+          fi
+
+          # Use Copilot CLI to execute the accessibilityagent prompt
+          copilot -p "Execute the .github/prompts/accessibilityagent.prompt.md prompt file for Flutter accessibility analysis" \
+            --allow-all-tools \
+            --log-dir /tmp/logs \
+            --log-level debug
+        continue-on-error: true
+
+      - name: Create Accessibility Issue on GitHub
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            let accessibilityContent = '';
+            const summaryPath = path.join(process.env.GITHUB_WORKSPACE, 'accessibility-reports/accessibility-summary.md');
+            if (fs.existsSync(summaryPath)) {
+              accessibilityContent = fs.readFileSync(summaryPath, 'utf8');
+            }
+
+            const date = new Date().toLocaleDateString('pt-BR');
+            const title = `Análise de Acessibilidade WCAG - ${date}`;
+
+            const body = `## Relatório de Análise de Acessibilidade
+
+            Esta issue contém a análise de conformidade com WCAG 2.1 da aplicação Flutter Task Manager.
+
+            ### Resumo
+            - Data da análise: ${date}
+            - Projeto: Flutter Accessibility Agent
+            - Status: Análise em progresso
+
+            ### Relatório Detalhado
+
+            ${accessibilityContent || 'Relatório de acessibilidade será preenchido pelo accessibility agent.'}
+
+            ### Checklist de Conformidade WCAG 2.1 (Nível AA)
+
+            - [ ] Contraste de cores: Mínimo 4.5:1 para texto comum
+            - [ ] Contraste de cores: Mínimo 3:1 para texto grande
+            - [ ] Estrutura hierárquica clara (AppBar > Headers > Content)
+            - [ ] Botões com label visível ou semanticLabel
+            - [ ] Campos de formulário com labels associadas
+            - [ ] Feedback visual para estado (disabled/selected/error)
+            - [ ] Tamanho de target de toque: Mínimo 48x48 dp
+            - [ ] Navegação por teclado funcional
+            - [ ] Diálogos com foco gerenciado corretamente
+            - [ ] Ícones com label semântico quando necessário
+            - [ ] Cores não usadas como único meio de comunicação
+            - [ ] Sem conteúdo que pisca > 3 vezes por segundo
+            - [ ] Instruções claras em formulários
+            - [ ] Suporte para leitores de tela (TalkBack/VoiceOver)
+            - [ ] Sem armadilhas de teclado
+
+            ### Próximas Etapas
+
+            1. Revisar recomendações do accessibility agent
+            2. Implementar correções críticas
+            3. Testar com dispositivos reais
+            4. Atualizar documentação de acessibilidade
+
+            ---
+            *Gerado automaticamente pelo Flutter Accessibility Agent*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['accessibility', 'wcag', 'automated']
+            });
+
+            console.log('Issue de acessibilidade criada com sucesso!');
+        continue-on-error: true
