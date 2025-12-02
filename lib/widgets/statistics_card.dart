@@ -10,30 +10,34 @@ class StatisticsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              StatisticColumn(
-                value: '${taskManager.totalCount}',
-                label: 'Total',
-                color: Colors.blue,
-              ),
-              StatisticColumn(
-                value: '${taskManager.completedCount}',
-                label: 'Concluídas',
-                color: Colors.green,
-              ),
-              StatisticColumn(
-                value: '${taskManager.totalCount - taskManager.completedCount}',
-                label: 'Pendentes',
-                color: Colors.orange,
-              ),
-            ],
+    return Semantics(
+      header: true,
+      label: 'Estatísticas das tarefas',
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                StatisticColumn(
+                  value: '${taskManager.totalCount}',
+                  label: 'Total',
+                  color: Colors.blue,
+                ),
+                StatisticColumn(
+                  value: '${taskManager.completedCount}',
+                  label: 'Concluídas',
+                  color: Colors.green,
+                ),
+                StatisticColumn(
+                  value: '${taskManager.totalCount - taskManager.completedCount}',
+                  label: 'Pendentes',
+                  color: Colors.orange,
+                ),
+              ],
+            ),
           ),
         ),
       ),

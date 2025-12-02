@@ -42,15 +42,18 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                hintText: 'Título da tarefa',
+                labelText: 'Título da tarefa',
+                hintText: 'Digite o título da tarefa',
                 border: OutlineInputBorder(),
               ),
+              autofocus: true,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
               decoration: const InputDecoration(
-                hintText: 'Descrição (opcional)',
+                labelText: 'Descrição (opcional)',
+                hintText: 'Digite uma descrição para a tarefa',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -63,7 +66,10 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),
         ),
-        ElevatedButton(onPressed: _addTask, child: const Text('Adicionar')),
+        ElevatedButton(
+          onPressed: _addTask,
+          child: const Text('Adicionar'),
+        ),
       ],
     );
   }

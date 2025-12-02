@@ -9,7 +9,12 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.task_alt, size: 64, color: Colors.grey[400]),
+          Icon(
+            Icons.task_alt,
+            size: 64,
+            color: Colors.grey[400],
+            semanticLabel: 'Ícone de lista de tarefas vazia',
+          ),
           const SizedBox(height: 16),
           Text(
             'Nenhuma tarefa adicionada',
