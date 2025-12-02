@@ -50,32 +50,48 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Gerenciador de Tarefas'), elevation: 2),
+      appBar: AppBar(
+        title: Semantics(
+          header: true,
+          child: const Text('Gerenciador de Tarefas'),
+        ),
+        elevation: 2,
+      ),
       body: _taskManager.tasks.isEmpty
           ? const EmptyState()
           : Column(
               children: [
                 StatisticsCard(taskManager: _taskManager),
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: _taskManager.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = _taskManager.tasks[index];
-                      return TaskItem(
-                        task: task,
-                        onToggle: () => _toggleTask(task.id),
-                        onDelete: () => _deleteTask(task.id),
-                      );
-                    },
+                  child: Semantics(
+                    label: 'Lista de tarefas',
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      itemCount: _taskManager.tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _taskManager.tasks[index];
+                        return TaskItem(
+                          task: task,
+                          onToggle: () => _toggleTask(task.id),
+                          onDelete: () => _deleteTask(task.id),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTaskDialog,
-        tooltip: 'Adicionar tarefa',
-        child: const Icon(Icons.add),
+      floatingActionButton: Semantics(
+        button: true,
+        label: 'Adicionar nova tarefa',
+        child: FloatingActionButton(
+          onPressed: _showAddTaskDialog,
+          tooltip: 'Adicionar tarefa',
+          child: const Icon(
+            Icons.add,
+            semanticLabel: 'Adicionar',
+          ),
+        ),
       ),
     );
   }

@@ -14,17 +14,24 @@ class StatisticColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
+    return Semantics(
+      label: '$label: $value',
+      child: Column(
+        children: [
+          ExcludeSemantics(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
           ),
-        ),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
+          ExcludeSemantics(
+            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ],
+      ),
     );
   }
 }
