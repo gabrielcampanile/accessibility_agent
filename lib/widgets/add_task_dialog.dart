@@ -72,6 +72,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               ),
               maxLines: 3,
               textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _addTask(),
             ),
           ],
         ),
