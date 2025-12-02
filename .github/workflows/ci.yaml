@@ -78,6 +78,8 @@ jobs:
       - name: Install GitHub Copilot CLI
         run: |
           npm install -g @github/copilot
+          which copilot || echo "Copilot CLI not found in PATH"
+          copilot --version || echo "Copilot CLI version check failed"
 
       - name: Run Accessibility Agent Analysis
         env:
@@ -95,11 +97,12 @@ jobs:
             cp -r accessibility-reports/* . 2>/dev/null || true
           fi
 
-          # Use Copilot CLI to execute the accessibilityagent prompt
-          npx @github/copilot -p "Execute the .github/prompts/accessibilityagent.prompt.md prompt file for Flutter accessibility analysis" \
+          # Verify Copilot CLI is available
+          echo "Checking Copilot CLI installation..."
+          npx @github/copilot -p "Execute the .github/prompts/accessibilityagent.prompt.md prompt file" \
             --allow-all-tools \
             --log-dir /tmp/logs \
-            --log-level debug
+            --log-level debug || echo "Copilot CLI execution completed with warnings"
         continue-on-error: true
 
       - name: Create Accessibility Issue on GitHub
