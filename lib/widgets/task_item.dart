@@ -19,7 +19,7 @@ class TaskItem extends StatelessWidget {
     final String taskStatus = task.isCompleted ? 'concluída' : 'pendente';
 
     return Semantics(
-      label: 'Tarefa: ${task.title}, $taskStatus. Deslize para a esquerda para excluir.',
+      label: 'Tarefa: ${task.title}, $taskStatus',
       child: Dismissible(
         key: Key(task.id),
         direction: DismissDirection.endToStart,
@@ -45,8 +45,8 @@ class TaskItem extends StatelessWidget {
                 onToggle();
               },
               semanticLabel: task.isCompleted
-                  ? 'Marcar tarefa ${task.title} como pendente'
-                  : 'Marcar tarefa ${task.title} como concluída',
+                  ? 'Marcar como pendente'
+                  : 'Marcar como concluída',
             ),
             title: Text(
               task.title,
