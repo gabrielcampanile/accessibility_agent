@@ -96,7 +96,10 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskDialog,
         tooltip: 'Adicionar tarefa',
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          semanticLabel: 'Adicionar nova tarefa',
+        ),
       ),
     );
   }
