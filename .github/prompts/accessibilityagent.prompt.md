@@ -94,6 +94,112 @@ Este é um aplicativo Flutter de gerenciamento de tarefas com:
    - Implementar feedback visual adequado
    - Documentar intenção de UI para leitores de tela
 
+### Atributos Semânticos Flutter - Clareza e Precisão
+
+**CRÍTICO: Utilizar auxiliares de semântica para garantir clareza na leitura aos leitores de tela:**
+
+#### 1. **enabled** (Booleano)
+   - Indica se um componente está ativo/inativo
+   - **Uso:** Todo componente interativo deve ter este atributo
+   - **Exemplo incorreto:** `IconButton(...)` sem informar estado
+   - **Exemplo correto:** 
+   ```dart
+   Semantics(
+     enabled: isButtonActive,
+     child: IconButton(...)
+   )
+   ```
+   - **Impacto:** Leitores de tela anunciam "desabilitado" automaticamente
+
+#### 2. **checked** (Booleano)
+   - Indica estado de Checkbox, Radio Button e componentes binários
+   - **Uso:** Sempre que há um estado de seleção binária
+   - **Exemplo incorreto:** `Checkbox(value: isChecked, ...)` sem Semantics
+   - **Exemplo correto:**
+   ```dart
+   Semantics(
+     checked: isChecked,
+     child: Checkbox(value: isChecked, ...)
+   )
+   ```
+   - **Impacto:** Anúncio claro: "marcado" ou "desmarcado"
+
+#### 3. **selected** (Booleano)
+   - Indica seleção em listas, tabs, menus e componentes multi-seleção
+   - **Uso:** Para itens que podem ser selecionados
+   - **Exemplo incorreto:** `ListTile(...)` sem indicar seleção
+   - **Exemplo correto:**
+   ```dart
+   Semantics(
+     selected: isSelected,
+     child: ListTile(...)
+   )
+   ```
+   - **Impacto:** Clareza sobre qual item está ativo/selecionado
+
+#### 4. **hint** (String)
+   - Texto de ajuda/dica que complementa o label principal
+   - **Uso:** Instruções adicionais, exemplos, validações esperadas
+   - **Exemplo com validação:**
+   ```dart
+   TextField(
+     decoration: InputDecoration(
+       labelText: "Email",
+       hintText: "exemplo@email.com",
+       helperText: "Use um email válido",
+     ),
+     semanticLabel: "Email - Use um email válido (exemplo@email.com)",
+   )
+   ```
+   - **Impacto:** Usuários entendem o que é esperado sem depender apenas de placeholder
+
+### Padrões de Implementação Recomendados
+
+**Para listas de tarefas (como Task Manager):**
+```dart
+Semantics(
+  label: "Tarefa: Fazer compras",
+  selected: isSelected,
+  enabled: !isCompleted,
+  child: CheckboxListTile(
+    title: Text("Fazer compras"),
+    subtitle: Text("Prioridade: Alta"),
+    value: isCompleted,
+    onChanged: onTaskToggle,
+  ),
+)
+```
+
+**Para diálogos de entrada:**
+```dart
+Semantics(
+  label: "Adicionar nova tarefa",
+  child: AlertDialog(
+    title: Text("Nova Tarefa"),
+    content: TextField(
+      decoration: InputDecoration(
+        labelText: "Título da tarefa",
+        hintText: "Ex: Estudar Flutter",
+        helperText: "Máximo 100 caracteres",
+      ),
+    ),
+  ),
+)
+```
+
+**Para componentes desabilitados:**
+```dart
+Semantics(
+  enabled: canDelete,
+  label: "Deletar tarefa: ${taskName}",
+  child: IconButton(
+    icon: Icon(Icons.delete, semanticLabel: "Deletar"),
+    onPressed: canDelete ? onDelete : null,
+    tooltip: "Deletar esta tarefa",
+  ),
+)
+```
+
 5. **Criar um Relatório Estruturado**
    - Resumo de conformidade WCAG por pilar
    - Lista de problemas críticos (impactam usabilidade)
@@ -225,6 +331,21 @@ Este é um aplicativo Flutter de gerenciamento de tarefas com:
 - [ ] Suporte para leitores de tela (TalkBack/VoiceOver)
 - [ ] Sem armadilhas de teclado (foco preso)
 
+## Checklist de Atributos Semânticos Flutter (Crítico)
+
+**Estes atributos DEVEM estar presentes em todos os componentes interativos:**
+
+- [ ] Componentes interativos possuem `enabled` correto
+- [ ] Checkboxes/RadioButtons possuem `checked` definido
+- [ ] Itens selecionáveis possuem `selected` definido
+- [ ] Campos com validação possuem `hint` ou `helperText` explicativo
+- [ ] Todos os ícones possuem `semanticLabel` ou estão em `Semantics`
+- [ ] Estados de erro são comunicados semanticamente
+- [ ] Botões desabilitados têm `enabled: false` em Semantics
+- [ ] Listas indicam claramente qual item está selecionado
+- [ ] Diálogos têm label semântico do propósito
+- [ ] Formulários têm labels visíveis + hints adicionais
+
 ## Prioridades de Implementação
 
 1. **Alta Prioridade** (Implementar imediatamente)
@@ -271,6 +392,34 @@ Crie uma nova Issue no repositório \`gabrielcampanile/accessibility_agent\` com
 ---
 
 **Nota importante:** Acessibilidade não é um recurso adicional, é um requisito fundamental para garantir que todos os usuários possam usar a aplicação, independentemente de suas capacidades ou limitações.
+
+## Validação de Atributos Semânticos por Componente
+
+### Para Checkboxes/Switches:
+- ✅ Possui `checked` em Semantics
+- ✅ Possui `semanticLabel` descritivo
+- ✅ Leitura clara quando ativado/desativado
+
+### Para Botões:
+- ✅ Possui `enabled` refletindo o estado
+- ✅ Possui `semanticLabel` ou label visível
+- ✅ Estados desabilitados são comunicados
+
+### Para Campos de Formulário:
+- ✅ Possui label visível (labelText)
+- ✅ Possui hint descritivo quando necessário
+- ✅ Mensagens de erro são semânticas (helperText)
+- ✅ Validação é clara via semanticLabel
+
+### Para Listas/Grids:
+- ✅ Itens possuem `selected` quando aplicável
+- ✅ Cada item tem label semântico
+- ✅ Estados são comunicados claramente
+
+### Para Ícones:
+- ✅ Todos possuem `semanticLabel`
+- ✅ Labels descrevem ação/propósito
+- ✅ Contexto é claro sem dependência visual
 
 ## Criando Pull Requests com Implementação
 
