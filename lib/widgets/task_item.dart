@@ -34,9 +34,6 @@ class TaskItem extends StatelessWidget {
             semanticLabel: 'Excluir tarefa',
           ),
         ),
-        confirmDismiss: (direction) async {
-          return true;
-        },
         onDismissed: (direction) {
           onDelete();
         },

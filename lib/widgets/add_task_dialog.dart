@@ -37,13 +37,12 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
       setState(() {
         _titleError = 'Por favor, insira um título';
       });
-      _titleFocusNode.requestFocus();
+      // Request focus after setState completes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _titleFocusNode.requestFocus();
+      });
       return;
     }
-
-    setState(() {
-      _titleError = null;
-    });
 
     widget.onTaskAdded(_titleController.text, _descriptionController.text);
   }
@@ -68,13 +67,6 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   errorText: _titleError,
                 ),
                 textInputAction: TextInputAction.next,
-                onChanged: (_) {
-                  if (_titleError != null) {
-                    setState(() {
-                      _titleError = null;
-                    });
-                  }
-                },
               ),
               const SizedBox(height: 16),
               TextField(
