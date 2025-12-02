@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/task.dart';
+import 'priority_badge.dart';
 
 class TaskItem extends StatelessWidget {
   final Task task;
@@ -45,15 +46,22 @@ class TaskItem extends StatelessWidget {
             ),
           ),
           subtitle: task.description.isNotEmpty
-              ? Text(
-                  task.description,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: task.isCompleted
-                        ? Colors.grey[400]
-                        : Colors.grey[600],
-                  ),
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: task.isCompleted
+                            ? Colors.grey[400]
+                            : Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    PriorityBadge(priority: TaskPriority.high),
+                  ],
                 )
               : null,
           trailing: IconButton(

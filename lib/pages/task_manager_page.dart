@@ -4,6 +4,7 @@ import '../services/task_manager.dart';
 import '../widgets/add_task_dialog.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/statistics_card.dart';
+import '../widgets/task_filter.dart';
 import '../widgets/task_item.dart';
 
 class TaskManagerPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class TaskManagerPage extends StatefulWidget {
 
 class _TaskManagerPageState extends State<TaskManagerPage> {
   final TaskManager _taskManager = TaskManager();
+  TaskFilterType _currentFilter = TaskFilterType.all;
 
   void _showAddTaskDialog() {
     showDialog(
@@ -47,6 +49,17 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
     setState(() {});
   }
 
+  List get _filteredTasks {
+    switch (_currentFilter) {
+      case TaskFilterType.all:
+        return _taskManager.tasks;
+      case TaskFilterType.completed:
+        return _taskManager.tasks.where((task) => task.isCompleted).toList();
+      case TaskFilterType.pending:
+        return _taskManager.tasks.where((task) => !task.isCompleted).toList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,12 +69,20 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
           : Column(
               children: [
                 StatisticsCard(taskManager: _taskManager),
+                TaskFilter(
+                  initialFilter: _currentFilter,
+                  onFilterChanged: (filter) {
+                    setState(() {
+                      _currentFilter = filter;
+                    });
+                  },
+                ),
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: _taskManager.tasks.length,
+                    itemCount: _filteredTasks.length,
                     itemBuilder: (context, index) {
-                      final task = _taskManager.tasks[index];
+                      final task = _filteredTasks[index];
                       return TaskItem(
                         task: task,
                         onToggle: () => _toggleTask(task.id),
