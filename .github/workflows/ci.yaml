@@ -96,7 +96,7 @@ jobs:
           fi
 
           # Use Copilot CLI to execute the accessibilityagent prompt
-          copilot -p "Execute the .github/prompts/accessibilityagent.prompt.md prompt file for Flutter accessibility analysis" \
+          npx @github/copilot -p "Execute the .github/prompts/accessibilityagent.prompt.md prompt file for Flutter accessibility analysis" \
             --allow-all-tools \
             --log-dir /tmp/logs \
             --log-level debug
