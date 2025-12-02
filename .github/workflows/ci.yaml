@@ -60,7 +60,7 @@ jobs:
           echo "5. Validar navegação por teclado" >> accessibility-reports/accessibility-summary.md
 
       - name: Upload accessibility reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: accessibility-reports
           path: accessibility-reports/
